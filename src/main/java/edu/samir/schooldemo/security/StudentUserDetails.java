@@ -8,17 +8,21 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-public class SecurityStudent implements UserDetails {
+public class StudentUserDetails implements UserDetails {
 
     private final Student student;
 
-    public SecurityStudent(Student student) {
+    public StudentUserDetails(Student student) {
         this.student = student;
+    }
+
+    public Student getStudent() {
+        return student;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of( () -> String.valueOf(Permission.STUDENT_READ));
+        return List.of( () -> String.valueOf(Permission.STUDENT_READ), () -> String.valueOf(Permission.STUDENT_WRITE));
     }
 
     @Override

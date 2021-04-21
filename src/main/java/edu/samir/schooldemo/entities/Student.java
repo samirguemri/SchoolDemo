@@ -28,15 +28,7 @@ import java.time.LocalDate;
 @JsonDeserialize(using = StudentDeserializer.class)
 public class Student extends Person{
 
-    @Column(nullable = false, unique = true)
-    String username;
-
-    @Column
-    String password;
-
     public Student(String firstName, String lastName, String email, LocalDate birthday, String username, String password) {
-        super(firstName, lastName, email, birthday, LocalDate.now().getYear() - birthday.getYear());
-        this.username = username;
-        this.password = password;
+        super(firstName, lastName, email, birthday, LocalDate.now().getYear() - birthday.getYear(), username, password);
     }
 }

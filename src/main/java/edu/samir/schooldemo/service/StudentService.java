@@ -53,7 +53,9 @@ public class StudentService {
     private void update(Student student, Student update) {
         student.setFirstName(update.getFirstName());
         student.setLastName(update.getLastName());
+        student.setEmail(update.getEmail());
         student.setBirthday(update.getBirthday());
+        student.setUsername(update.getUsername());
         student.setPassword(update.getPassword());
     }
 
@@ -63,6 +65,12 @@ public class StudentService {
             throw new UserNotFoundException("Student with the given Id does NOT EXISTS !");
         }
         studentRepository.deleteById(id);
+    }
+
+    public void deleteStudent(@NotNull String username) throws UserNotFoundException {
+        Optional<Student> optionalStudent = studentRepository.findStudentByUsername(username);
+        Student student = optionalStudent.orElseThrow(() -> new UserNotFoundException("Student with the given Id does NOT EXISTS !"));
+        studentRepository.deleteById(student.getId());
     }
 
 }

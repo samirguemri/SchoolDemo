@@ -35,11 +35,19 @@ public abstract class Person {
     @Column(nullable = false)
     Integer age;
 
-    public Person(String firstName, String lastName, String email, LocalDate birthday, Integer age) {
+    @Column(unique = true)
+    String username;
+
+    @Column(length = 60)
+    String password;
+
+    public Person(String firstName, String lastName, String email, LocalDate birthday, Integer age, String username, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.birthday = birthday;
         this.age = age;
+        this.username = username;
+        this.password = password;
     }
 }

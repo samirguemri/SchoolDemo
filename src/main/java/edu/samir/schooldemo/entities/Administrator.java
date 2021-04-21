@@ -22,20 +22,12 @@ import java.time.LocalDate;
 )
 public class Administrator extends Person{
 
-    @Column(nullable = false, unique = true)
-    String username;
-
-    @Column
-    String password;
-
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     Role role;
 
     public Administrator(String firstName, String lastName, String email, LocalDate birthday, String username, String password, Role role) {
-        super(firstName, lastName, email, birthday, LocalDate.now().getYear() - birthday.getYear());
-        this.username = username;
-        this.password = password;
+        super(firstName, lastName, email, birthday, LocalDate.now().getYear() - birthday.getYear(), username, password);
         this.role = role;
     }
 }
