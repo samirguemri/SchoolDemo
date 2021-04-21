@@ -22,9 +22,7 @@ public class MyAuthenticationProvider implements AuthenticationProvider {
             throws AuthenticationException { // here we implement the authentication logic
 
         // if the Authentication isn't supported by the AP then return null
-        if ( !supports(authentication.getClass())){
-            return null;
-        }
+        // the test already done in the ProviderManager.authenticate()
 
         String username = authentication.getName();
         String password = String.valueOf(authentication.getCredentials());
