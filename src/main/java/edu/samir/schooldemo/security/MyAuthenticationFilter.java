@@ -9,6 +9,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationConverter;
 import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -16,19 +17,17 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
-public class MyAuthenticationFilter implements Filter {
+public class MyAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     private AuthenticationManager authenticationManager;
     private BasicAuthenticationConverter authenticationConverter = new BasicAuthenticationConverter();
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+    public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
 
         // Convert and extract the Authentication Token
-        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
-        UsernamePasswordAuthenticationToken authenticationToken = authenticationConverter.convert(httpServletRequest);
+        UsernamePasswordAuthenticationToken authenticationToken = authenticationConverter.convert(request);
 
         // Authenticate the httpRequest
         try {
@@ -40,10 +39,10 @@ public class MyAuthenticationFilter implements Filter {
                 SecurityContextHolder.getContext().setAuthentication(authenticateResult);
                 filterChain.doFilter(request, response);
             } else {
-                httpServletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             }
         }catch (AuthenticationException exception){
-            httpServletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         }
     }
 }
