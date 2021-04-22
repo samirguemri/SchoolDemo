@@ -1,4 +1,4 @@
-package edu.samir.schooldemo.entities;
+package edu.samir.schooldemo.persistence.entity;
 
 public enum Role {
     STUDENT("STUDENT"),

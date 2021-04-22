@@ -1,13 +1,12 @@
 package edu.samir.schooldemo.security;
 
-import edu.samir.schooldemo.entities.Student;
 import edu.samir.schooldemo.exception.UserNotFoundException;
-import edu.samir.schooldemo.repository.StudentRepository;
-import edu.samir.schooldemo.service.StudentService;
+import edu.samir.schooldemo.persistence.entity.User;
+import edu.samir.schooldemo.persistence.repository.UserRepository;
+import edu.samir.schooldemo.security.model.MyUserDetails;
+import edu.samir.schooldemo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.log.LogMessage;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,35 +16,30 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-@Component
-public class MyJpaUserDetailsManager implements UserDetailsManager {
+@Component("MyUserDetailsManager")
+public class MyUserDetailsManager implements UserDetailsManager {
 
-    @Autowired private StudentRepository studentRepository;
-    @Autowired private StudentService studentService;
+    @Autowired private UserRepository userRepository;
+    @Autowired private UserService userService;
 
     @Override
     public UserDetails loadUserByUsername(String username)  {
-        final Optional<Student> optionalStudent = studentRepository.findStudentByUsername(username);
-        Student student = optionalStudent.orElseThrow(() -> new UsernameNotFoundException("Student with the given username does NOT EXISTS"));
-        return new StudentUserDetails(student);
-    }
-
-    private Student getStudentFromStudentDetails(UserDetails userDetails){
-        StudentUserDetails studentUserDetails = (StudentUserDetails) userDetails;
-        return studentUserDetails.getStudent();
+        final Optional<User> optionalStudent = userRepository.findUserByUsername(username);
+        User user = optionalStudent.orElseThrow(() -> new UsernameNotFoundException("Student with the given username does NOT EXISTS"));
+        return new MyUserDetails(user);
     }
 
     @Override
     public void createUser(UserDetails userDetails) {
-        Student student = getStudentFromStudentDetails(userDetails);
-        studentRepository.save(student);
+        User user = getUserFromUserDetails(userDetails);
+        userRepository.save(user);
     }
 
     @Override
     public void updateUser(UserDetails userDetails) {
-        Student student = getStudentFromStudentDetails(userDetails);
+        User user = getUserFromUserDetails(userDetails);
         try {
-            studentService.updateStudent(student.getId(),student);
+            userService.updateUser(user.getId(),user);
         } catch (UserNotFoundException e) {
             e.printStackTrace();
         }
@@ -54,7 +48,7 @@ public class MyJpaUserDetailsManager implements UserDetailsManager {
     @Override
     public void deleteUser(String username) {
         try {
-            studentService.deleteStudent(username);
+            userService.deleteUser(username);
         } catch (UserNotFoundException e) {
             e.printStackTrace();
         }
@@ -67,8 +61,8 @@ public class MyJpaUserDetailsManager implements UserDetailsManager {
             throw new AccessDeniedException("Can't change password as no Authentication object found in context for current user.");
         }
         String username = currentUser.getName();
-        Student student = getStudentFromStudentDetails(loadUserByUsername(username));
-        student.setPassword(newPassword);
+        User user = getUserFromUserDetails(loadUserByUsername(username));
+        user.setPassword(newPassword);
     }
 
     @Override
@@ -76,4 +70,8 @@ public class MyJpaUserDetailsManager implements UserDetailsManager {
         return loadUserByUsername(username) != null;
     }
 
+    private User getUserFromUserDetails(UserDetails userDetails){
+        MyUserDetails details = (MyUserDetails) userDetails;
+        return details.getUser();
+    }
 }

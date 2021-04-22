@@ -1,4 +1,4 @@
-package edu.samir.schooldemo.security;
+package edu.samir.schooldemo.security.filter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
-public class MyAuthenticationFilter extends OncePerRequestFilter {
+public class UsernamePasswordAuthenticationFilter extends OncePerRequestFilter /*implements Filter*/ {
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -44,5 +44,10 @@ public class MyAuthenticationFilter extends OncePerRequestFilter {
         }catch (AuthenticationException exception){
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         }
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException { // to avoid filtering of the given request
+        return super.shouldNotFilter(request);
     }
 }

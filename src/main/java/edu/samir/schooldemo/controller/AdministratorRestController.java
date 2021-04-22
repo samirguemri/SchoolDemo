@@ -1,8 +1,8 @@
 package edu.samir.schooldemo.controller;
 
 import edu.samir.schooldemo.exception.UserNotFoundException;
-import edu.samir.schooldemo.entities.Student;
-import edu.samir.schooldemo.service.StudentService;
+import edu.samir.schooldemo.persistence.entity.User;
+import edu.samir.schooldemo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,25 +13,25 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/student")
-public class StudentController {
+@RequestMapping("api/admin")
+public class AdministratorRestController {
 
-    private final StudentService studentService;
+    private final UserService userService;
 
     @Autowired
-    public StudentController(StudentService studentService) {
-        this.studentService = studentService;
+    public AdministratorRestController(UserService userService) {
+        this.userService = userService;
     }
 
     @PostMapping(
             path = "add",
             consumes = "application/json"
     )
-    public ResponseEntity<Student> addStudent(@NotNull @RequestBody Student student){
-        if (student == null)
+    public ResponseEntity<User> addNewUser(@NotNull @RequestBody User administrator){
+        if (administrator == null)
             return ResponseEntity.noContent().build();
 
-        Student newStudent = studentService.insertNewStudent(student);
+        User newUser = userService.insertNewUser(administrator);
 
         String currentRequestPath = ServletUriComponentsBuilder.fromCurrentRequest().build().getPath();
         String newPath = extractPath(currentRequestPath);
@@ -40,7 +40,7 @@ public class StudentController {
                 .fromCurrentRequest()
                 .replacePath(newPath)
                 .path("/{id}")
-                .buildAndExpand(newStudent.getId())
+                .buildAndExpand(newUser.getId())
                 .toUri();
         return ResponseEntity.created(location).build();
     }
@@ -55,26 +55,26 @@ public class StudentController {
             path = "{id}",
             produces = "application/json"
     )
-    public ResponseEntity<Student> selectStudent(@NotNull @PathVariable Long id) {
-        Student student = null;
+    public ResponseEntity<User> selectStudent(@NotNull @PathVariable Long id) {
+        User administrator = null;
         try {
-            student = studentService.selectStudent(id);
+            administrator = userService.selectUser(id);
         }catch (UserNotFoundException e){
             ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(student);
+        return ResponseEntity.ok(administrator);
     }
 
     @GetMapping(
             path = "all",
             produces = "application/json"
     )
-    public ResponseEntity<List<Student>> selectAllStudents(){
-        List<Student> students = studentService.selectAllStudents();
-        if (students.isEmpty()){
+    public ResponseEntity<List<User>> selectAllUsers(){
+        List<User> administrators = userService.selectAllUsers();
+        if (administrators.isEmpty()){
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(students);
+        return ResponseEntity.ok(administrators);
     }
 
     @PutMapping(
@@ -82,22 +82,22 @@ public class StudentController {
             consumes = "application/json",
             produces = "application/json"
     )
-    public ResponseEntity<Student> updateStudent(@NotNull @PathVariable Long id, @NotNull @RequestBody Student student) {
-        Student updatedStudent = null;
+    public ResponseEntity<User> updateUser(@NotNull @PathVariable Long id, @NotNull @RequestBody User administrator) {
+        User updatedUser = null;
         try {
-            updatedStudent = studentService.updateStudent(id, student);
+            updatedUser = userService.updateUser(id, administrator);
         } catch (UserNotFoundException e) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(updatedStudent);
+        return ResponseEntity.ok(updatedUser);
     }
 
     @DeleteMapping(
             path = "{id}"
     )
-    public ResponseEntity<Boolean> deleteStudent(@NotNull @PathVariable Long id){
+    public ResponseEntity<Boolean> deleteUser(@NotNull @PathVariable Long id){
         try {
-            studentService.deleteStudent(id);
+            userService.deleteUser(id);
         } catch (UserNotFoundException e) {
             return ResponseEntity.noContent().build();
         }

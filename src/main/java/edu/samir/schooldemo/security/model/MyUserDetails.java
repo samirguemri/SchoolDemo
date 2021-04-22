@@ -1,23 +1,23 @@
-package edu.samir.schooldemo.security;
+package edu.samir.schooldemo.security.model;
 
-import edu.samir.schooldemo.entities.Permission;
-import edu.samir.schooldemo.entities.Student;
+import edu.samir.schooldemo.persistence.entity.Permission;
+import edu.samir.schooldemo.persistence.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
 
-public class StudentUserDetails implements UserDetails {
+public class MyUserDetails implements UserDetails {
 
-    private final Student student;
+    private final User user;
 
-    public StudentUserDetails(Student student) {
-        this.student = student;
+    public MyUserDetails(User user) {
+        this.user = user;
     }
 
-    public Student getStudent() {
-        return student;
+    public User getUser() {
+        return user;
     }
 
     @Override
@@ -27,12 +27,12 @@ public class StudentUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return student.getPassword();
+        return user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return student.getUsername();
+        return user.getUsername();
     }
 
     @Override

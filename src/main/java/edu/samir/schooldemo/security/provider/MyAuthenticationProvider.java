@@ -1,6 +1,7 @@
-package edu.samir.schooldemo.security;
+package edu.samir.schooldemo.security.provider;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,15 +15,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class MyAuthenticationProvider implements AuthenticationProvider {
 
-    @Autowired private UserDetailsManager userDetailsManager;
-    @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired @Qualifier("MyUserDetailsManager")
+    private UserDetailsManager userDetailsManager;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public Authentication authenticate(Authentication authentication)
             throws AuthenticationException { // here we implement the authentication logic
 
         // if the Authentication isn't supported by the AP then return null
-        // the test already done in the ProviderManager.authenticate()
+        // the test is already done in the ProviderManager.authenticate()
 
         String username = authentication.getName();
         String password = String.valueOf(authentication.getCredentials());
@@ -44,6 +47,6 @@ public class MyAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public boolean supports(Class<?> authenticationType) {
-        return UsernamePasswordAuthenticationToken.class.equals(authenticationType);
+        return authenticationType.equals(UsernamePasswordAuthenticationToken.class);
     }
 }

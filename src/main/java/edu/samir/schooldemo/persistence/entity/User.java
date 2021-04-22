@@ -1,5 +1,7 @@
-package edu.samir.schooldemo.entities;
+package edu.samir.schooldemo.persistence.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import edu.samir.schooldemo.config.json.UserDeserializer;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,13 +13,22 @@ import java.time.LocalDate;
 @FieldDefaults(level= AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Data
-@MappedSuperclass
-public abstract class Person {
+@Entity
+@Table(
+        name = "users",
+        uniqueConstraints =
+        @UniqueConstraint(
+                name = "USER_CONSTRAINTS",
+                columnNames = {"email","username"}
+        )
+)
+@JsonDeserialize(using = UserDeserializer.class)
+public class User {
 
     @Id
     @Column(name = "id", updatable = false, nullable = false)
-    @SequenceGenerator(name = "PERSON_SEQ", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PERSON_SEQ")
+    @SequenceGenerator(name = "USER_SEQ", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "USER_SEQ")
     Long id;
 
     @Column(name = "first_name")
@@ -41,7 +52,7 @@ public abstract class Person {
     @Column(length = 60)
     String password;
 
-    public Person(String firstName, String lastName, String email, LocalDate birthday, Integer age, String username, String password) {
+    public User(String firstName, String lastName, String email, LocalDate birthday, Integer age, String username, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
