@@ -15,12 +15,12 @@ public class StudentConfig {
     @Bean
     CommandLineRunner commandLineRunner(UserRepository userRepository){
         return args -> {
-            User samir = new User(
-                    "Samir",
-                    "Guemri",
+            User sam = new User(
+                    "Sam",
+                    "Gomri",
                     "samir.guemri@gmail.com",
-                    LocalDate.of(1986, 9, 22),
-                    35,
+                    LocalDate.of(1996, 9, 02),
+                    25,
                     "samir2nice",
                     "test123"
             );
@@ -34,7 +34,7 @@ public class StudentConfig {
                     "alex",
                     "test123"
             );
-            userRepository.saveAll(List.of(samir, alex));
+            userRepository.saveAll(List.of(sam, alex));
         };
     }
 }

@@ -1,7 +1,9 @@
 package edu.samir.schooldemo.controller;
 
+import edu.samir.schooldemo.controller.dto.UserDto;
 import edu.samir.schooldemo.exception.UserNotFoundException;
 import edu.samir.schooldemo.persistence.entity.User;
+import edu.samir.schooldemo.service.RegistrationNotificationEmailSender;
 import edu.samir.schooldemo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,34 +24,6 @@ public class StudentRestController {
     public StudentRestController(UserService userService) {
         this.userService = userService;
     }
-
-    @PostMapping(
-            path = "/api/student/add",
-            consumes = "application/json"
-    )
-    public ResponseEntity<User> addNewStudent(@NotNull @RequestBody User user){
-        if (user == null)
-            return ResponseEntity.noContent().build();
-
-        User newUser = userService.insertNewUser(user);
-
-        String currentRequestPath = ServletUriComponentsBuilder.fromCurrentRequest().build().getPath();
-        String newPath = extractPath(currentRequestPath);
-
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .replacePath(newPath)
-                .path("/{id}")
-                .buildAndExpand(newUser.getId())
-                .toUri();
-        return ResponseEntity.created(location).build();
-    }
-
-    private String extractPath(String currentRequestPath) {
-        int index = currentRequestPath.lastIndexOf("/");
-        return currentRequestPath.substring(0, index);
-    }
-
 
     @GetMapping(
             path = "/api/student/{id}",

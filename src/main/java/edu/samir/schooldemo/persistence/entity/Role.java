@@ -1,18 +1,30 @@
 package edu.samir.schooldemo.persistence.entity;
 
-public enum Role {
-    STUDENT("STUDENT"),
-    SUPERADMIN("SUPERADMIN"),
-    ADMIN("ADMIN"),
-    TRAINEE("TRAINEE");
+import edu.samir.schooldemo.persistence.entity.enums.RoleEnum;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
-    private String roleName;
+import javax.persistence.*;
+import java.util.List;
 
-    Role(String roleName){
-        this.roleName = roleName;
-    }
+@FieldDefaults(level= AccessLevel.PRIVATE)
+@NoArgsConstructor
+@Data
+@Entity
+public class Role {
 
-    public String getRoleName() {
-        return roleName;
-    }
+    @Id
+    @Column(updatable = false, nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    RoleEnum role;
+
+    @ManyToMany(mappedBy = "roles")
+    List<User> users;
+
 }

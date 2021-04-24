@@ -1,18 +1,21 @@
 package edu.samir.schooldemo.persistence.entity;
 
-public enum Permission {
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
-    STUDENT_READ("student:read"),
-    STUDENT_WRITE("student:write"),
-    ADMIN_READ("admin:read"),
-    ADMIN_WRITE("admin:write");
+import javax.persistence.*;
 
-    private String  permission;
-    Permission(String permission) {
-        this.permission = permission;
-    }
+@FieldDefaults(level= AccessLevel.PRIVATE)
+@NoArgsConstructor
+@Data
+@Entity
+public class Permission {
 
-    public String getPermission() {
-        return this.permission;
-    }
+    @Id
+    @Column(updatable = false, nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long permissionId;
+
 }

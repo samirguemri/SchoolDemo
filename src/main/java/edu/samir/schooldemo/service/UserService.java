@@ -1,5 +1,6 @@
 package edu.samir.schooldemo.service;
 
+import edu.samir.schooldemo.controller.dto.UserDto;
 import edu.samir.schooldemo.persistence.repository.UserRepository;
 import edu.samir.schooldemo.exception.UserNotFoundException;
 import edu.samir.schooldemo.persistence.entity.User;
@@ -20,11 +21,23 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User insertNewUser(@NotNull User user){
+    public void registerNewUser(@NotNull final UserDto userDto){
+
+        if ( userRepository.findUserByEmail(userDto.getEmail()).isPresent() ||
+                userRepository.findUserByUsername(userDto.getUsername()).isPresent() ) {
+            throw new RuntimeException("User with the given email OR username EXISTS");
+        }
+
+    }
+
+    public User insertNewUser(@NotNull final User user){
+
+/*
         if ( userRepository.findUserByEmail(user.getEmail()).isPresent() ||
                         userRepository.findUserByUsername(user.getUsername()).isPresent() ) {
             throw new RuntimeException("User with the given email OR username EXISTS");
         }
+*/
         return userRepository.save(user);
     }
 
@@ -67,7 +80,7 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public void deleteUser(@NotNull String username) throws UserNotFoundException {
+    public void deleteUser(@NotNull final String username) throws UserNotFoundException {
         Optional<User> optionalUser = userRepository.findUserByUsername(username);
         User user = optionalUser.orElseThrow(() -> new UserNotFoundException("User with the given Id does NOT EXISTS !"));
         userRepository.deleteById(user.getId());

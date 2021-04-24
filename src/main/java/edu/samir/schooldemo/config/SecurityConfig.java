@@ -38,6 +38,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .and()
             .logout()
                 .permitAll();*/
+        .csrf().disable()
         .httpBasic();
 
         // What URLs to protect (authenticated()) and which ones are allowed (permitAll())
@@ -46,7 +47,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .mvcMatchers("*")
                     .permitAll()
                 .anyRequest()
-                    .authenticated();//permitAll();//
+                    .permitAll();//authenticated();//
     }
 
     @Bean

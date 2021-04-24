@@ -13,13 +13,13 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 @Configuration
-public class UserDeserializer extends StdDeserializer<User> {
+public class UserDtoDeserializer extends StdDeserializer<User> {
 
-    public UserDeserializer() {
+    public UserDtoDeserializer() {
         this(null);
     }
 
-    private UserDeserializer(Class<?> vc) {
+    private UserDtoDeserializer(Class<?> vc) {
         super(vc);
     }
 

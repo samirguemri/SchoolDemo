@@ -1,7 +1,6 @@
 package edu.samir.schooldemo.persistence.entity;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import edu.samir.schooldemo.config.json.UserDeserializer;
+import edu.samir.schooldemo.controller.dto.UserDto;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,26 +8,26 @@ import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
-@FieldDefaults(level= AccessLevel.PROTECTED)
+@FieldDefaults(level= AccessLevel.PRIVATE)
 @NoArgsConstructor
 @Data
 @Entity
 @Table(
-        name = "users",
+        name = "user_account",
         uniqueConstraints =
         @UniqueConstraint(
                 name = "USER_CONSTRAINTS",
                 columnNames = {"email","username"}
         )
 )
-@JsonDeserialize(using = UserDeserializer.class)
 public class User {
 
     @Id
-    @Column(name = "id", updatable = false, nullable = false)
-    @SequenceGenerator(name = "USER_SEQ", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "USER_SEQ")
+    @Column(updatable = false, nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     @Column(name = "first_name")
@@ -52,6 +51,28 @@ public class User {
     @Column(length = 60)
     String password;
 
+    @Column(columnDefinition = "BOOLEAN")
+    boolean enabled;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_role_association",
+            joinColumns = @JoinColumn(name = "userId", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "roleId", referencedColumnName = "id")
+    )
+    List<Role> roles;
+
+    public User(UserDto userDto) {
+        this.firstName = userDto.getFirstName();
+        this.lastName = userDto.getLastName();
+        this.email = userDto.getEmail();
+        this.birthday = userDto.getBirthday();
+        this.age = LocalDate.now().getYear() - userDto.getBirthday().getYear();
+        this.username = userDto.getUsername();
+        this.password = userDto.getPassword();
+        this.enabled = false;
+    }
+
     public User(String firstName, String lastName, String email, LocalDate birthday, Integer age, String username, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -60,5 +81,6 @@ public class User {
         this.age = age;
         this.username = username;
         this.password = password;
+        this.enabled = false;
     }
 }

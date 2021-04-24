@@ -1,6 +1,6 @@
 package edu.samir.schooldemo.security.model;
 
-import edu.samir.schooldemo.persistence.entity.Permission;
+import edu.samir.schooldemo.persistence.entity.enums.PermissionEnum;
 import edu.samir.schooldemo.persistence.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,7 +22,7 @@ public class MyUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of( () -> String.valueOf(Permission.STUDENT_READ), () -> String.valueOf(Permission.STUDENT_WRITE));
+        return List.of( () -> String.valueOf(PermissionEnum.STUDENT_READ), () -> String.valueOf(PermissionEnum.STUDENT_WRITE));
     }
 
     @Override
