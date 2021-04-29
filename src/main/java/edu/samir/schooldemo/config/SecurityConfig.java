@@ -1,9 +1,10 @@
 package edu.samir.schooldemo.config;
 
 import edu.samir.schooldemo.security.JpaUserDetailsManager;
-import edu.samir.schooldemo.security.filter.TwoStepsAuthenticationFilter;
-import edu.samir.schooldemo.security.provider.MyAuthenticationProvider;
+import edu.samir.schooldemo.security.filter.TokenAuthenticationFilter;
+import edu.samir.schooldemo.security.filter.MultifactorAuthenticationFilter;
 import edu.samir.schooldemo.security.provider.OtpAuthenticationProvider;
+import edu.samir.schooldemo.security.provider.TokenAuthenticationProvider;
 import edu.samir.schooldemo.security.provider.UsernamePasswordAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -22,14 +23,8 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import javax.sql.DataSource;
 
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity(debug = false)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
-    @Autowired
-    private DataSource dataSource;
-
-    @Autowired
-    private MyAuthenticationProvider myAuthenticationProvider;
 
     @Autowired
     private UsernamePasswordAuthenticationProvider usernamePasswordAuthenticationProvider;
@@ -38,12 +33,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private OtpAuthenticationProvider otpAuthenticationProvider;
 
     @Autowired
-    private TwoStepsAuthenticationFilter twoStepsAuthenticationFilter;
+    private TokenAuthenticationProvider tokenAuthenticationProvider;
+
+    @Autowired
+    private DataSource dataSource;
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception { // What and how to secure
 
-        http.addFilterAt(twoStepsAuthenticationFilter, BasicAuthenticationFilter.class);
+        http.addFilterAt(multifactorAuthenticationFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(tokenAuthenticationFilter(), BasicAuthenticationFilter.class);
 
         // Which authentication methods are allowed (formLogin(), httpBasic()) and how they are configured
         http
@@ -59,9 +59,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth//.authenticationProvider(myAuthenticationProvider)
-                .authenticationProvider(usernamePasswordAuthenticationProvider)
-                    .authenticationProvider(otpAuthenticationProvider);
+        auth.authenticationProvider(usernamePasswordAuthenticationProvider)
+                .authenticationProvider(otpAuthenticationProvider)
+                    .authenticationProvider(tokenAuthenticationProvider);
         return;
     }
 
@@ -82,6 +82,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
+
+    @Bean
+    public MultifactorAuthenticationFilter multifactorAuthenticationFilter(){
+        return new MultifactorAuthenticationFilter();
+    }
+
+    @Bean
+    public TokenAuthenticationFilter tokenAuthenticationFilter(){
+        return new TokenAuthenticationFilter();
+    }
+
 
     private DataSource dataSource(){
         return dataSource;

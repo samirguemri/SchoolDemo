@@ -8,11 +8,6 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class MainController {
 
-    @GetMapping("/login")
-    public ModelAndView login(){
-        return new ModelAndView("login");
-    }
-
     @GetMapping(path = "/web/student")
     public String student(){
         return "student.html";

@@ -34,14 +34,14 @@ public class RegistrationRestController {
         return "Home!";
     }
 
-    @GetMapping("/welcome")
+    @GetMapping("/home")
     public String welcome() {
         return "Welcome Home!!";
     }
 
-    @GetMapping("/secure")
+    @GetMapping("/login")
     public String securePage() {
-        return "Welcome to the securePage!";
+        return "Welcome to the login Page!";
     }
 
     @PostMapping(
