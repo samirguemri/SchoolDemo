@@ -8,6 +8,7 @@ public enum PermissionEnum {
     ADMIN_WRITE("admin:write");
 
     private String  permission;
+
     PermissionEnum(String permission) {
         this.permission = permission;
     }

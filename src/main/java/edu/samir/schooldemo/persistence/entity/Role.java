@@ -7,7 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 @FieldDefaults(level= AccessLevel.PRIVATE)
 @NoArgsConstructor
@@ -24,7 +26,20 @@ public class Role {
     @Enumerated(EnumType.STRING)
     RoleEnum role;
 
-    @ManyToMany(mappedBy = "roles")
-    List<User> users;
+/*
+    @ManyToMany(fetch=FetchType.EAGER)
+    @JoinTable(
+            name = "role_permission_association",
+            joinColumns = @JoinColumn(name = "roleId", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "permissionId", referencedColumnName = "id"),
+            foreignKey = @ForeignKey(name = "ROLE_FOREIGN_KEY_CONSTRAINTS"),
+            inverseForeignKey = @ForeignKey(name = "PERMISSION_FOREIGN_KEY_CONSTRAINTS")
+    )
+    @Column
+    Set<Permission> permissions;
+*/
 
+    public Role(RoleEnum role) {
+        this.role = role;
+    }
 }

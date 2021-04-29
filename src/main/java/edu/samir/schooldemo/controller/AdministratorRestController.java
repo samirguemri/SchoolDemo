@@ -1,16 +1,13 @@
 package edu.samir.schooldemo.controller;
 
-import edu.samir.schooldemo.controller.dto.UserDto;
 import edu.samir.schooldemo.exception.UserNotFoundException;
 import edu.samir.schooldemo.persistence.entity.User;
 import edu.samir.schooldemo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.constraints.NotNull;
-import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -70,7 +67,7 @@ public class AdministratorRestController {
     )
     public ResponseEntity<Boolean> deleteUser(@NotNull @PathVariable Long id){
         try {
-            userService.deleteUser(id);
+            userService.deleteUserById(id);
         } catch (UserNotFoundException e) {
             return ResponseEntity.noContent().build();
         }

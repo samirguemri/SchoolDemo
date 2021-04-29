@@ -16,8 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@Component
-public class UsernamePasswordAuthenticationFilter extends OncePerRequestFilter /*implements Filter*/ {
+//@Component
+public class SimpleAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     private AuthenticationManager authenticationManager;

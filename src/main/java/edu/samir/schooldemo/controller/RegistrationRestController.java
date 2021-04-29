@@ -1,9 +1,9 @@
 package edu.samir.schooldemo.controller;
 
 import edu.samir.schooldemo.controller.dto.UserDto;
+import edu.samir.schooldemo.event.EmailNotificationEvent;
 import edu.samir.schooldemo.persistence.entity.User;
-import edu.samir.schooldemo.service.RegistrationAuthenticationEvent;
-import edu.samir.schooldemo.service.RegistrationNotificationEmailSender;
+import edu.samir.schooldemo.service.EmailNotificationEventService;
 import edu.samir.schooldemo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,13 +20,28 @@ public class RegistrationRestController {
 
     private UserDto userDto;
     private final UserService userService;
-    private final RegistrationNotificationEmailSender emailSender;
-    private RegistrationAuthenticationEvent registrationEvent;
+    private final EmailNotificationEventService emailSenderService;
+    private EmailNotificationEvent registrationEvent;
 
     @Autowired
-    public RegistrationRestController(UserService userService, RegistrationNotificationEmailSender emailSender) {
+    public RegistrationRestController(UserService userService, EmailNotificationEventService emailSenderService) {
         this.userService = userService;
-        this.emailSender = emailSender;
+        this.emailSenderService = emailSenderService;
+    }
+
+    @GetMapping("/")
+    public String home() {
+        return "Home!";
+    }
+
+    @GetMapping("/welcome")
+    public String welcome() {
+        return "Welcome Home!!";
+    }
+
+    @GetMapping("/secure")
+    public String securePage() {
+        return "Welcome to the securePage!";
     }
 
     @PostMapping(
@@ -40,17 +55,17 @@ public class RegistrationRestController {
         this.userDto = userDto;
 
         // before adding, the user should confirm registration
-        registrationEvent = new RegistrationAuthenticationEvent(userDto, request);
-        emailSender.confirmRegistration(registrationEvent);
+        registrationEvent = new EmailNotificationEvent(request, userDto.getEmail() );
+        emailSenderService.confirmRegistration(registrationEvent);
 
-        return ResponseEntity.ok(userDto);
+        ResponseEntity<UserDto> dtoResponseEntity = ResponseEntity.ok(userDto);
+        return dtoResponseEntity;
     }
 
-    @PostMapping("/api/user/registration/registrationConfirm/{registrationToken}")
-    public ResponseEntity<User> validateRegistration(final HttpServletRequest request, @PathVariable String registrationToken){
+    @GetMapping(path = "/api/user/registration/confirmRegistration/{registrationPath}")
+    public ResponseEntity<User> validateRegistration(@PathVariable String registrationPath){
 
-        registrationEvent.setRequest(request);
-        boolean validaRegistration = emailSender.validateRegistration(registrationToken);
+        boolean validaRegistration = emailSenderService.validateRegistration(registrationPath);
 
         if ( !validaRegistration ){
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
@@ -66,10 +81,5 @@ public class RegistrationRestController {
                 .toUri();
         return ResponseEntity.created(location).build();
 
-    }
-
-    private String extractPath(String currentRequestPath) {
-        int index = currentRequestPath.lastIndexOf("/");
-        return currentRequestPath.substring(0, index);
     }
  }

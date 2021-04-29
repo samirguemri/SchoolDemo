@@ -1,11 +1,12 @@
 package edu.samir.schooldemo.security.filter;
 
-import edu.samir.schooldemo.security.authentication.EmailNotificationAuthentication;
+import edu.samir.schooldemo.event.EmailNotificationEvent;
+import edu.samir.schooldemo.security.authentication.OtpAuthentication;
 import edu.samir.schooldemo.security.authentication.UsernamePasswordAuthentication;
+import edu.samir.schooldemo.service.EmailNotificationEventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -15,62 +16,61 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.Random;
 
-@Component("2StepsAuthenticationFilter")
+@Component
 public class TwoStepsAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private EmailNotificationEventService emailSenderService;
+
     @Override
-    protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
+    public void doFilterInternal(HttpServletRequest request,
+                                 HttpServletResponse response,
+                                 FilterChain filterChain) throws IOException, ServletException {
 
-        // 2 steps Authentication
-        // step1 : using username & password
-        // step2 : using email & random key
+        String username = request.getHeader("username");
+        String password = request.getHeader("password");
+        String otp = request.getHeader("otp");
 
-        String username = httpServletRequest.getHeader("username");
-        String password = httpServletRequest.getHeader("password");
-        String email = httpServletRequest.getHeader("email");
+        if (otp == null) {
+            // step 1
+            Authentication authentication = this.authenticationManager.authenticate(new UsernamePasswordAuthentication(username, password));
 
-        if ( email == null ) { // we are still step1
+            if (authentication.isAuthenticated()){ // if the token is authenticated
 
-            UsernamePasswordAuthentication usernamePasswordAuthentication = new UsernamePasswordAuthentication(username, password);
-            doAuthentication(usernamePasswordAuthentication, httpServletResponse);
+                // Add the authenticateResult to the Spring Security Context
+                SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // at this stage : we are sure that the authentication is OK
-            // so we can go to step2
-            // but before we should send the notificationAuthenticationMail
-
-        } else { // we are basically in step2
-            String randomKey = generateRandomKey();
-            EmailNotificationAuthentication emailNotificationAuthentication = new EmailNotificationAuthentication(email, randomKey);
-            doAuthentication(emailNotificationAuthentication, httpServletResponse);
-        }
-
-        filterChain.doFilter(httpServletRequest, httpServletResponse);
-    }
-
-    private String generateRandomKey() {
-        byte[] array = new byte[5]; // length is bounded by 7
-        new Random().nextBytes(array);
-        return new String(array, Charset.forName("UTF-8"));
-    }
-
-    private void doAuthentication(Authentication authentication, HttpServletResponse response){
-        try {
-            Authentication authenticationResult = authenticationManager.authenticate(authentication);
-
-            if (authenticationResult.isAuthenticated()){
-                SecurityContextHolder.getContext().setAuthentication(authenticationResult);
+                // send Otp token through email notification
+                this.emailSenderService.notifyAuthentication(new EmailNotificationEvent(request, username));
             } else {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             }
-        } catch (AuthenticationException exception) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+
+        } else {
+            // step 2
+            Authentication authentication = this.authenticationManager.authenticate(new OtpAuthentication(username, otp));
+            if (authentication.isAuthenticated()){ // if the token is authenticated
+
+                // Add the authenticateResult to the Spring Security Context
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } else {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            }
         }
+
+        filterChain.doFilter(request, response);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        // to avoid filtering of the given request
+        // !(should NOT Filter those reqPath) => the filter would be enabled for those reqPath
+        //return !request.getServletPath().equals("/login") || !request.getServletPath().equals("/secure");
+        return super.shouldNotFilter(request);
     }
 
 }

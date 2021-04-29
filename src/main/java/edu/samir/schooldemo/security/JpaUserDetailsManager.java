@@ -3,7 +3,7 @@ package edu.samir.schooldemo.security;
 import edu.samir.schooldemo.exception.UserNotFoundException;
 import edu.samir.schooldemo.persistence.entity.User;
 import edu.samir.schooldemo.persistence.repository.UserRepository;
-import edu.samir.schooldemo.security.model.MyUserDetails;
+import edu.samir.schooldemo.security.model.SecurityUser;
 import edu.samir.schooldemo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
@@ -12,21 +12,21 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.provisioning.UserDetailsManager;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@Component("MyUserDetailsManager")
-public class MyUserDetailsManager implements UserDetailsManager {
+@Service("MyUserDetailsManager")
+public class JpaUserDetailsManager implements UserDetailsManager {
 
     @Autowired private UserRepository userRepository;
     @Autowired private UserService userService;
 
     @Override
-    public UserDetails loadUserByUsername(String username)  {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         final Optional<User> optionalStudent = userRepository.findUserByUsername(username);
-        User user = optionalStudent.orElseThrow(() -> new UsernameNotFoundException("Student with the given username does NOT EXISTS"));
-        return new MyUserDetails(user);
+        User user = optionalStudent.orElseThrow(() -> new UsernameNotFoundException("User with the given username does NOT EXISTS"));
+        return new SecurityUser(user);
     }
 
     @Override
@@ -48,7 +48,7 @@ public class MyUserDetailsManager implements UserDetailsManager {
     @Override
     public void deleteUser(String username) {
         try {
-            userService.deleteUser(username);
+            userService.deleteUserByUsername(username);
         } catch (UserNotFoundException e) {
             e.printStackTrace();
         }
@@ -67,11 +67,16 @@ public class MyUserDetailsManager implements UserDetailsManager {
 
     @Override
     public boolean userExists(String username) {
-        return loadUserByUsername(username) != null;
+        try {
+            loadUserByUsername(username);
+            return true;
+        } catch (UsernameNotFoundException e) {
+            return false;
+        }
     }
 
     private User getUserFromUserDetails(UserDetails userDetails){
-        MyUserDetails details = (MyUserDetails) userDetails;
-        return details.getUser();
+        SecurityUser securityUser = (SecurityUser) userDetails;
+        return securityUser.getUser();
     }
 }

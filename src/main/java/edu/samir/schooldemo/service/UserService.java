@@ -21,17 +21,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public void registerNewUser(@NotNull final UserDto userDto){
-
-        if ( userRepository.findUserByEmail(userDto.getEmail()).isPresent() ||
-                userRepository.findUserByUsername(userDto.getUsername()).isPresent() ) {
-            throw new RuntimeException("User with the given email OR username EXISTS");
-        }
-
-    }
-
     public User insertNewUser(@NotNull final User user){
-
 /*
         if ( userRepository.findUserByEmail(user.getEmail()).isPresent() ||
                         userRepository.findUserByUsername(user.getUsername()).isPresent() ) {
@@ -72,7 +62,7 @@ public class UserService {
         user.setPassword(update.getPassword());
     }
 
-    public void deleteUser(@NotNull Long id) throws UserNotFoundException {
+    public void deleteUserById(@NotNull Long id) throws UserNotFoundException {
         Optional<User> optionalUser = userRepository.findById(id);
         if (optionalUser.isEmpty()) {
             throw new UserNotFoundException("User with the given Id does NOT EXISTS !");
@@ -80,7 +70,7 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public void deleteUser(@NotNull final String username) throws UserNotFoundException {
+    public void deleteUserByUsername(@NotNull final String username) throws UserNotFoundException {
         Optional<User> optionalUser = userRepository.findUserByUsername(username);
         User user = optionalUser.orElseThrow(() -> new UserNotFoundException("User with the given Id does NOT EXISTS !"));
         userRepository.deleteById(user.getId());

@@ -9,7 +9,9 @@ import lombok.experimental.FieldDefaults;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @FieldDefaults(level= AccessLevel.PRIVATE)
 @NoArgsConstructor
@@ -36,7 +38,7 @@ public class User {
     @Column(name = "last_name")
     String lastName;
 
-    @Column(updatable = false, unique = true)
+    @Column(updatable = false)
     String email;
 
     @Column(columnDefinition = "DATE")
@@ -45,7 +47,7 @@ public class User {
     @Column(nullable = false)
     Integer age;
 
-    @Column(unique = true)
+    @Column
     String username;
 
     @Column(length = 60)
@@ -54,13 +56,16 @@ public class User {
     @Column(columnDefinition = "BOOLEAN")
     boolean enabled;
 
-    @ManyToMany
+    @ManyToMany(fetch=FetchType.EAGER)
     @JoinTable(
             name = "user_role_association",
             joinColumns = @JoinColumn(name = "userId", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "roleId", referencedColumnName = "id")
+            inverseJoinColumns = @JoinColumn(name = "roleId", referencedColumnName = "id"),
+            foreignKey = @ForeignKey(name = "USER_FOREIGN_KEY_CONSTRAINTS"),
+            inverseForeignKey = @ForeignKey(name = "ROLE_FOREIGN_KEY_CONSTRAINTS")
     )
-    List<Role> roles;
+    @Column
+    Set<Role> roles;
 
     public User(UserDto userDto) {
         this.firstName = userDto.getFirstName();

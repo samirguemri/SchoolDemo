@@ -3,22 +3,22 @@ package edu.samir.schooldemo.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
-@RequestMapping("web")
 public class MainController {
 
-    @GetMapping
-    public String home(){
-        return "home.html";
+    @GetMapping("/login")
+    public ModelAndView login(){
+        return new ModelAndView("login");
     }
 
-    @GetMapping(path = "student")
+    @GetMapping(path = "/web/student")
     public String student(){
         return "student.html";
     }
 
-    @GetMapping(path = "admin")
+    @GetMapping(path = "/web/admin")
     public String admin(){
         return "admin.html";
     }

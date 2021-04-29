@@ -1,7 +1,5 @@
 package edu.samir.schooldemo.controller.dto;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import edu.samir.schooldemo.config.json.UserDtoDeserializer;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,13 +14,10 @@ import java.time.LocalDate;
 @Data
 //@JsonDeserialize(using = UserDtoDeserializer.class)
 public class UserDto {
-
     String firstName;
     String lastName;
     String email;
     LocalDate birthday;
     String username;
     String password;
-
-    String registrationToken;
 }

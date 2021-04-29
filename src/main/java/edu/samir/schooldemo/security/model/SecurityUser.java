@@ -1,18 +1,22 @@
 package edu.samir.schooldemo.security.model;
 
+import edu.samir.schooldemo.persistence.entity.Role;
 import edu.samir.schooldemo.persistence.entity.enums.PermissionEnum;
 import edu.samir.schooldemo.persistence.entity.User;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-public class MyUserDetails implements UserDetails {
+public class SecurityUser implements UserDetails {
 
     private final User user;
 
-    public MyUserDetails(User user) {
+    public SecurityUser(User user) {
         this.user = user;
     }
 
@@ -22,7 +26,10 @@ public class MyUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of( () -> String.valueOf(PermissionEnum.STUDENT_READ), () -> String.valueOf(PermissionEnum.STUDENT_WRITE));
+        Set<Role> roles = this.getUser().getRoles();
+        return roles.stream()
+                .map( role -> new SimpleGrantedAuthority(role.getRole().getRoleName()) )
+                .collect(Collectors.toList());
     }
 
     @Override
