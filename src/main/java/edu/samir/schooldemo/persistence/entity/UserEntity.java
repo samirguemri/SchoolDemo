@@ -25,7 +25,7 @@ import java.util.Set;
                 columnNames = {"email","username"}
         )
 )
-public class User {
+public class UserEntity {
 
     @Id
     @Column(updatable = false, nullable = false)
@@ -67,7 +67,7 @@ public class User {
     @Column
     Set<Role> roles;
 
-    public User(UserDto userDto) {
+    public UserEntity(UserDto userDto) {
         this.firstName = userDto.getFirstName();
         this.lastName = userDto.getLastName();
         this.email = userDto.getEmail();
@@ -78,7 +78,7 @@ public class User {
         this.enabled = false;
     }
 
-    public User(String firstName, String lastName, String email, LocalDate birthday, Integer age, String username, String password) {
+    public UserEntity(String firstName, String lastName, String email, LocalDate birthday, Integer age, String username, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;

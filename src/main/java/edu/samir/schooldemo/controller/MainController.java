@@ -8,13 +8,18 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class MainController {
 
-    @GetMapping(path = "/web/student")
-    public String student(){
-        return "student.html";
+    @GetMapping(path = "/welcome")
+    public String home(){
+        return "home";
     }
 
-    @GetMapping(path = "/web/admin")
+    @GetMapping(path = "/student/")
+    public String student(){
+        return "web/student";
+    }
+
+    @GetMapping(path = "/admin")
     public String admin(){
-        return "admin.html";
+        return "web/admin";
     }
 }

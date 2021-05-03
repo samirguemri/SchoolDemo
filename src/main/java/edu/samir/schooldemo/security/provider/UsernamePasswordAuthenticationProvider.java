@@ -38,7 +38,6 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
         // if the request is authenticated we should return an fully authenticated (with authorities) authentication instance
         if (userDetails != null){
             if (passwordEncoder.matches(password, userDetails.getPassword())){
-                //final Authentication result = super.authenticate(authentication);
                 return new UsernamePasswordAuthentication(username, password, userDetails.getAuthorities());
             }
         }

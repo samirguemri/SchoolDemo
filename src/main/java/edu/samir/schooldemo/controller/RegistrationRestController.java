@@ -1,31 +1,25 @@
 package edu.samir.schooldemo.controller;
 
 import edu.samir.schooldemo.controller.dto.UserDto;
-import edu.samir.schooldemo.event.EmailNotificationEvent;
-import edu.samir.schooldemo.persistence.entity.User;
+import edu.samir.schooldemo.exception.EmailNotValidException;
+import edu.samir.schooldemo.persistence.entity.UserEntity;
 import edu.samir.schooldemo.service.EmailNotificationEventService;
-import edu.samir.schooldemo.service.UserService;
+import edu.samir.schooldemo.service.registration.RegistrationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
-import java.net.URI;
 
 @RestController
 public class RegistrationRestController {
 
-    private UserDto userDto;
-    private final UserService userService;
+    private final RegistrationService registrationService;
     private final EmailNotificationEventService emailSenderService;
-    private EmailNotificationEvent registrationEvent;
 
     @Autowired
-    public RegistrationRestController(UserService userService, EmailNotificationEventService emailSenderService) {
-        this.userService = userService;
+    public RegistrationRestController(RegistrationService registrationService, EmailNotificationEventService emailSenderService) {
+        this.registrationService = registrationService;
         this.emailSenderService = emailSenderService;
     }
 
@@ -34,6 +28,7 @@ public class RegistrationRestController {
         return "Home!";
     }
 
+    //@Async
     @GetMapping("/home")
     public String welcome() {
         return "Welcome Home!!";
@@ -48,22 +43,29 @@ public class RegistrationRestController {
             path = "/api/user/registration",
             consumes = "application/json"
     )
-    public ResponseEntity<UserDto> registerNewUser(final HttpServletRequest request, @NotNull @RequestBody UserDto userDto){
+    public ResponseEntity<UserEntity> registerNewUser(final @NotNull @RequestBody UserDto userDto) {
 
+        UserEntity userEntity = null;
         if (userDto == null)
             return ResponseEntity.noContent().build();
-        this.userDto = userDto;
 
-        // before adding, the user should confirm registration
-        registrationEvent = new EmailNotificationEvent(request, userDto.getEmail() );
-        emailSenderService.confirmRegistration(registrationEvent);
-
-        ResponseEntity<UserDto> dtoResponseEntity = ResponseEntity.ok(userDto);
-        return dtoResponseEntity;
+        try {
+            userEntity = registrationService.registerNewUser(userDto);
+        } catch (EmailNotValidException e) {
+            // TODO: process exception
+            e.printStackTrace();
+        }
+        return ResponseEntity.ok(userEntity);
     }
 
+    @GetMapping("/api/user/registration/resend/{username}")
+    public String resendConfirmationToken(@PathVariable String username){
+        return registrationService.reSendConfirmationToken(username);
+    }
+
+/*
     @GetMapping(path = "/api/user/registration/confirmRegistration/{registrationPath}")
-    public ResponseEntity<User> validateRegistration(@PathVariable String registrationPath){
+    public ResponseEntity<UserEntity> validateRegistration(@PathVariable String registrationPath) throws EmailNotValidException {
 
         boolean validaRegistration = emailSenderService.validateRegistration(registrationPath);
 
@@ -71,15 +73,16 @@ public class RegistrationRestController {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
 
-        User newUser = userService.insertNewUser(new User(userDto));
+        UserEntity newUserEntity = registrationService.registerNewUser(userDto);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .replacePath("/api/student")
                 .path("/{id}")
-                .buildAndExpand(newUser.getId())
+                .buildAndExpand(newUserEntity.getId())
                 .toUri();
         return ResponseEntity.created(location).build();
 
     }
- }
+*/
+}

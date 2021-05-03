@@ -1,4 +1,4 @@
-package edu.samir.schooldemo.persistence.entity;
+package edu.samir.schooldemo.service.authentication.otp;
 
 import lombok.AccessLevel;
 import lombok.Data;

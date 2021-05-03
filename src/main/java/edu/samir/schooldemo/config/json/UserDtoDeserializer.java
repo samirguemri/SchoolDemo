@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import edu.samir.schooldemo.persistence.entity.User;
+import edu.samir.schooldemo.persistence.entity.UserEntity;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 @Configuration
-public class UserDtoDeserializer extends StdDeserializer<User> {
+public class UserDtoDeserializer extends StdDeserializer<UserEntity> {
 
     public UserDtoDeserializer() {
         this(null);
@@ -24,7 +24,7 @@ public class UserDtoDeserializer extends StdDeserializer<User> {
     }
 
     @Override
-    public User deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+    public UserEntity deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
 
         JsonNode node = jsonParser.getCodec().readTree(jsonParser);
 
@@ -36,6 +36,6 @@ public class UserDtoDeserializer extends StdDeserializer<User> {
         String password = node.get("password").asText();
         Integer age = LocalDate.now().getYear() - birthday.getYear();
 
-        return new User(firstName,lastName,email,birthday, age,username,password);
+        return new UserEntity(firstName,lastName,email,birthday, age,username,password);
     }
 }

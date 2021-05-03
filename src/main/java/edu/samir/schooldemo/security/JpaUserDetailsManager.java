@@ -1,45 +1,58 @@
 package edu.samir.schooldemo.security;
 
 import edu.samir.schooldemo.exception.UserNotFoundException;
-import edu.samir.schooldemo.persistence.entity.User;
+import edu.samir.schooldemo.persistence.entity.UserEntity;
 import edu.samir.schooldemo.persistence.repository.UserRepository;
 import edu.samir.schooldemo.security.model.SecurityUser;
 import edu.samir.schooldemo.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@Service("MyUserDetailsManager")
+@AllArgsConstructor
+@Service
 public class JpaUserDetailsManager implements UserDetailsManager {
 
-    @Autowired private UserRepository userRepository;
-    @Autowired private UserService userService;
+    private final UserService userService;
+    private final UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        final Optional<User> optionalStudent = userRepository.findUserByUsername(username);
-        User user = optionalStudent.orElseThrow(() -> new UsernameNotFoundException("User with the given username does NOT EXISTS"));
-        return new SecurityUser(user);
+        final Optional<UserEntity> optionalStudent = userRepository.findUserByUsername(username);
+        UserEntity userEntity = optionalStudent.orElseThrow(() -> new UsernameNotFoundException("User with the given username does NOT EXISTS"));
+        return new SecurityUser(userEntity);
     }
+
 
     @Override
     public void createUser(UserDetails userDetails) {
-        User user = getUserFromUserDetails(userDetails);
-        userRepository.save(user);
+
+        UserEntity userEntity = getUserFromUserDetails(userDetails);
+
+        String username = userEntity.getUsername();
+        if ( userExists(username) )
+            throw new IllegalArgumentException(String.format("username %s already taken !",username));
+
+        String email = userEntity.getEmail();
+        if ( emailExists(email) )
+            throw new IllegalArgumentException(String.format("email %s already taken !",email));
+
+        userRepository.save(userEntity);
     }
 
     @Override
     public void updateUser(UserDetails userDetails) {
-        User user = getUserFromUserDetails(userDetails);
+        UserEntity userEntity = getUserFromUserDetails(userDetails);
         try {
-            userService.updateUser(user.getId(),user);
+            userService.updateUser(userEntity.getId(), userEntity);
         } catch (UserNotFoundException e) {
             e.printStackTrace();
         }
@@ -61,22 +74,27 @@ public class JpaUserDetailsManager implements UserDetailsManager {
             throw new AccessDeniedException("Can't change password as no Authentication object found in context for current user.");
         }
         String username = currentUser.getName();
-        User user = getUserFromUserDetails(loadUserByUsername(username));
-        user.setPassword(newPassword);
+        UserEntity userEntity = getUserFromUserDetails(loadUserByUsername(username));
+        userEntity.setPassword(newPassword);
     }
 
     @Override
     public boolean userExists(String username) {
-        try {
-            loadUserByUsername(username);
-            return true;
-        } catch (UsernameNotFoundException e) {
-            return false;
-        }
+            return userRepository.findUserByUsername(username).isPresent();
     }
 
-    private User getUserFromUserDetails(UserDetails userDetails){
+    public boolean emailExists(String email) {
+        return userRepository.findUserByEmail(email).isPresent();
+    }
+
+    private UserEntity getUserFromUserDetails(UserDetails userDetails){
         SecurityUser securityUser = (SecurityUser) userDetails;
-        return securityUser.getUser();
+        return securityUser.getUserEntity();
+    }
+
+    public void enableUser(String username) {
+        SecurityUser securityUser = (SecurityUser) loadUserByUsername(username);
+        securityUser.getUserEntity().setEnabled(true);
+        this.updateUser(securityUser);
     }
 }

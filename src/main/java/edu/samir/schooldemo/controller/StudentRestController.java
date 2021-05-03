@@ -1,7 +1,7 @@
 package edu.samir.schooldemo.controller;
 
 import edu.samir.schooldemo.exception.UserNotFoundException;
-import edu.samir.schooldemo.persistence.entity.User;
+import edu.samir.schooldemo.persistence.entity.UserEntity;
 import edu.samir.schooldemo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +11,6 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
-@RequestMapping
 public class StudentRestController {
 
     private final UserService userService;
@@ -25,22 +24,22 @@ public class StudentRestController {
             path = "/api/student/{id}",
             produces = "application/json"
     )
-    public ResponseEntity<User> selectUser(@NotNull @PathVariable Long id) {
-        User user = null;
+    public ResponseEntity<UserEntity> selectUser(@NotNull @PathVariable Long id) {
+        UserEntity userEntity = null;
         try {
-            user = userService.selectUser(id);
+            userEntity = userService.selectUser(id);
         }catch (UserNotFoundException e){
             ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(userEntity);
     }
 
     @GetMapping(
             path = "/api/student/all",
             produces = "application/json"
     )
-    public ResponseEntity<List<User>> selectAllStudents(){
-        List<User> students = userService.selectAllUsers();
+    public ResponseEntity<List<UserEntity>> selectAllStudents(){
+        List<UserEntity> students = userService.selectAllUsers();
         if (students.isEmpty()){
             return ResponseEntity.noContent().build();
         }
@@ -52,8 +51,8 @@ public class StudentRestController {
             consumes = "application/json",
             produces = "application/json"
     )
-    public ResponseEntity<User> updateStudent(@NotNull @PathVariable Long id, @NotNull @RequestBody User student) {
-        User updatedStudent = null;
+    public ResponseEntity<UserEntity> updateStudent(@NotNull @PathVariable Long id, @NotNull @RequestBody UserEntity student) {
+        UserEntity updatedStudent = null;
         try {
             updatedStudent = userService.updateUser(id, student);
         } catch (UserNotFoundException e) {

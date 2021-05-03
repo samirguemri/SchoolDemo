@@ -1,8 +1,8 @@
 package edu.samir.schooldemo.service;
 
-import edu.samir.schooldemo.event.EmailNotificationEvent;
-import edu.samir.schooldemo.persistence.entity.Otp;
-import edu.samir.schooldemo.persistence.repository.OptRepository;
+import edu.samir.schooldemo.service.registration.event.RegistrationEvent;
+import edu.samir.schooldemo.service.authentication.otp.Otp;
+import edu.samir.schooldemo.service.authentication.otp.OptRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
@@ -10,7 +10,6 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
 
@@ -25,7 +24,7 @@ public class EmailNotificationEventService {
     private final MessageSource messages;
     private final JavaMailSender mailSender;
     private final Environment springEnvironment;
-    private EmailNotificationEvent event;
+    private RegistrationEvent event;
 
     @Autowired
     public EmailNotificationEventService(OptRepository optRepository,
@@ -38,7 +37,7 @@ public class EmailNotificationEventService {
         this.springEnvironment = springEnvironment;
     }
 
-    public void confirmRegistration(EmailNotificationEvent registrationEvent) {
+    public void confirmRegistration(RegistrationEvent registrationEvent) {
 
         this.event = registrationEvent;
         String emailString = registrationEvent.getEmail();
@@ -54,7 +53,7 @@ public class EmailNotificationEventService {
 
         String encodedPath = PathEncoder.encode(stringToEncode);
         final String confirmationUrl = new StringBuilder()
-                .append(event.getUrl())
+                //.append(event.getUrl())
                 .append("confirmRegistration/")
                 .append(encodedPath)
                 .toString();
@@ -75,9 +74,9 @@ public class EmailNotificationEventService {
         return validRegistrationLink && event.getEmail().equals(email);
     }
 
-    private SimpleMailMessage constructRegistrationEmailMessage(final EmailNotificationEvent emailNotificationEvent, final String confirmationUrl) {
+    private SimpleMailMessage constructRegistrationEmailMessage(final RegistrationEvent registrationEvent, final String confirmationUrl) {
 
-        final String recipientEmail = emailNotificationEvent.getEmail();
+        final String recipientEmail = registrationEvent.getEmail();
         final String subject = "Registration Confirmation";
 
         final String message = messages.getMessage("message.regSuccLink",
@@ -94,14 +93,14 @@ public class EmailNotificationEventService {
         return email;
     }
 
-    public void notifyAuthentication(EmailNotificationEvent authenticationEvent){
+    public void notifyAuthentication(RegistrationEvent authenticationEvent){
 
         String email = authenticationEvent.getEmail();
         Date expiryTime = calculateExpiryDate(FIVE_MINUTES_EXPIRATION);
         String otp = generateRandomOtp();
 
         final String confirmationUrl = new StringBuilder()
-                .append(authenticationEvent.getUrl())
+                //.append(authenticationEvent.getUrl())
                 .append("confirmAuthentication/")
                 //.append(encodedPath)
                 .toString();
@@ -127,11 +126,11 @@ public class EmailNotificationEventService {
     }
 */
 
-    private SimpleMailMessage constructAuthenticationEmailMessage(final EmailNotificationEvent emailNotificationEvent,
+    private SimpleMailMessage constructAuthenticationEmailMessage(final RegistrationEvent registrationEvent,
                                                                   final String confirmationUrl,
                                                                   final String otp) {
 
-        final String recipientEmail = emailNotificationEvent.getEmail();
+        final String recipientEmail = registrationEvent.getEmail();
         final String subject = "Authentication Confirmation";
 
         final String message = messages.getMessage("message.regSuccLink",
