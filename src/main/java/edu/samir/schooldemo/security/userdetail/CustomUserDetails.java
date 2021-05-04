@@ -1,6 +1,6 @@
-package edu.samir.schooldemo.security.model;
+package edu.samir.schooldemo.security.userdetail;
 
-import edu.samir.schooldemo.persistence.entity.Role;
+import edu.samir.schooldemo.persistence.entity.UserRole;
 import edu.samir.schooldemo.persistence.entity.UserEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
-public class SecurityUser implements UserDetails {
+public class CustomUserDetails implements UserDetails {
 
     private final UserEntity userEntity;
 
@@ -32,9 +32,9 @@ public class SecurityUser implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Set<Role> roles = this.getUserEntity().getRoles();
-        return roles.stream()
-                .map( role -> new SimpleGrantedAuthority(role.getRole().getRoleName()) )
+        Collection<UserRole> userRoles = this.getUserEntity().getUserRoles();
+        return userRoles.stream()
+                .map(userRole -> new SimpleGrantedAuthority(userRole.getRole().getRoleName()) )
                 .collect(Collectors.toList());
     }
 

@@ -3,16 +3,11 @@ package edu.samir.schooldemo.security.filter;
 import edu.samir.schooldemo.security.authentication.OtpAuthentication;
 import edu.samir.schooldemo.security.authentication.UsernamePasswordAuthentication;
 import edu.samir.schooldemo.security.manager.TokenManager;
-import edu.samir.schooldemo.security.model.SecurityUser;
-import edu.samir.schooldemo.service.EmailNotificationEventService;
 import edu.samir.schooldemo.service.authentication.otp.Otp;
 import edu.samir.schooldemo.service.authentication.otp.OtpService;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.provisioning.UserDetailsManager;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;

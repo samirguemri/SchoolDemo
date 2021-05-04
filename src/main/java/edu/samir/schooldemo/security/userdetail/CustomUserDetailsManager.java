@@ -1,9 +1,8 @@
-package edu.samir.schooldemo.security;
+package edu.samir.schooldemo.security.userdetail;
 
 import edu.samir.schooldemo.exception.UserNotFoundException;
 import edu.samir.schooldemo.persistence.entity.UserEntity;
 import edu.samir.schooldemo.persistence.repository.UserRepository;
-import edu.samir.schooldemo.security.model.SecurityUser;
 import edu.samir.schooldemo.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -11,7 +10,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +17,7 @@ import java.util.Optional;
 
 @AllArgsConstructor
 @Service
-public class JpaUserDetailsManager implements UserDetailsManager {
+public class CustomUserDetailsManager implements UserDetailsManager {
 
     private final UserService userService;
     private final UserRepository userRepository;
@@ -28,9 +26,8 @@ public class JpaUserDetailsManager implements UserDetailsManager {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         final Optional<UserEntity> optionalStudent = userRepository.findUserByUsername(username);
         UserEntity userEntity = optionalStudent.orElseThrow(() -> new UsernameNotFoundException("User with the given username does NOT EXISTS"));
-        return new SecurityUser(userEntity);
+        return new CustomUserDetails(userEntity);
     }
-
 
     @Override
     public void createUser(UserDetails userDetails) {
@@ -88,8 +85,8 @@ public class JpaUserDetailsManager implements UserDetailsManager {
     }
 
     private UserEntity getUserFromUserDetails(UserDetails userDetails){
-        SecurityUser securityUser = (SecurityUser) userDetails;
-        return securityUser.getUserEntity();
+        CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
+        return customUserDetails.getUserEntity();
     }
 
     public void enableUser(UserEntity userEntity) throws UserNotFoundException {

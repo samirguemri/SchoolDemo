@@ -1,21 +1,19 @@
 package edu.samir.schooldemo.persistence.entity;
 
-import edu.samir.schooldemo.persistence.entity.enums.RoleEnum;
+import edu.samir.schooldemo.persistence.entity.enums.Role;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collection;
 
 @FieldDefaults(level= AccessLevel.PRIVATE)
 @NoArgsConstructor
 @Data
 @Entity
-public class Role {
+public class UserRole {
 
     @Id
     @Column(updatable = false, nullable = false)
@@ -24,10 +22,9 @@ public class Role {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    RoleEnum role;
+    Role role;
 
-/*
-    @ManyToMany(fetch=FetchType.EAGER)
+    @ManyToMany(cascade=CascadeType.ALL)
     @JoinTable(
             name = "role_permission_association",
             joinColumns = @JoinColumn(name = "roleId", referencedColumnName = "id"),
@@ -36,10 +33,9 @@ public class Role {
             inverseForeignKey = @ForeignKey(name = "PERMISSION_FOREIGN_KEY_CONSTRAINTS")
     )
     @Column
-    Set<Permission> permissions;
-*/
+    Collection<UserPermission> permissions;
 
-    public Role(RoleEnum role) {
+    public UserRole(Role role) {
         this.role = role;
     }
 }

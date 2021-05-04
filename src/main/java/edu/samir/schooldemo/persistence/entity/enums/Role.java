@@ -1,14 +1,14 @@
 package edu.samir.schooldemo.persistence.entity.enums;
 
-public enum RoleEnum {
+public enum Role {
     STUDENT("STUDENT"),
     MANAGER("MANAGER"),
     ADMIN("ADMIN"),
-    TRAINEE("TRAINEE");
+    TEACHER("TEACHER");
 
     private String roleName;
 
-    RoleEnum(String roleName){
+    Role(String roleName){
         this.roleName = roleName;
     }
 

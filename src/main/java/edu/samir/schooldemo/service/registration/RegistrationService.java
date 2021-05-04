@@ -5,8 +5,8 @@ import edu.samir.schooldemo.exception.EmailNotValidException;
 import edu.samir.schooldemo.exception.TokenNotFoundException;
 import edu.samir.schooldemo.exception.UserNotFoundException;
 import edu.samir.schooldemo.persistence.entity.UserEntity;
-import edu.samir.schooldemo.security.JpaUserDetailsManager;
-import edu.samir.schooldemo.security.model.SecurityUser;
+import edu.samir.schooldemo.security.userdetail.CustomUserDetailsManager;
+import edu.samir.schooldemo.security.userdetail.CustomUserDetails;
 import edu.samir.schooldemo.service.registration.event.RegistrationEventPublisher;
 import edu.samir.schooldemo.service.registration.token.ConfirmationToken;
 import edu.samir.schooldemo.service.registration.token.ConfirmationTokenService;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
-import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -25,7 +24,7 @@ import java.util.UUID;
 @Service
 public class RegistrationService {
 
-    private final JpaUserDetailsManager userDetailsManager;
+    private final CustomUserDetailsManager userDetailsManager;
     private final PasswordEncoder passwordEncoder;
     private final EmailValidator emailValidator;
     private final RegistrationEventPublisher registrationEventPublisher;
@@ -43,7 +42,7 @@ public class RegistrationService {
         ConfirmationToken confirmationToken = this.createRandomConfirmationToken(userEntity);
 
         // Create the User
-        userDetailsManager.createUser(new SecurityUser(userEntity));
+        userDetailsManager.createUser(new CustomUserDetails(userEntity));
         // Generate and save random Token
         confirmationTokenService.saveToken(confirmationToken);
         // Email the Token
@@ -54,7 +53,7 @@ public class RegistrationService {
 
     public String reSendConfirmationToken(@NotNull final String path, @NotNull final String username){
 
-        UserEntity userEntity = ((SecurityUser) userDetailsManager.loadUserByUsername(username)).getUserEntity();
+        UserEntity userEntity = ((CustomUserDetails) userDetailsManager.loadUserByUsername(username)).getUserEntity();
         ConfirmationToken confirmationToken = this.createRandomConfirmationToken(userEntity);
 
         // Generate and save random Token

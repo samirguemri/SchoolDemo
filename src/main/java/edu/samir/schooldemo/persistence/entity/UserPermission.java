@@ -1,7 +1,6 @@
 package edu.samir.schooldemo.persistence.entity;
 
-import edu.samir.schooldemo.persistence.entity.enums.PermissionEnum;
-import edu.samir.schooldemo.persistence.entity.enums.RoleEnum;
+import edu.samir.schooldemo.persistence.entity.enums.Permission;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,7 +12,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Data
 @Entity
-public class Permission {
+public class UserPermission {
 
     @Id
     @Column(updatable = false, nullable = false)
@@ -22,9 +21,9 @@ public class Permission {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    PermissionEnum permission;
+    Permission permission;
 
-    public Permission(PermissionEnum permission) {
+    public UserPermission(Permission permission) {
         this.permission = permission;
     }
 }
