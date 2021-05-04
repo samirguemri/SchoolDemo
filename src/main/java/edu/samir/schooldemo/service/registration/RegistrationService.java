@@ -3,6 +3,7 @@ package edu.samir.schooldemo.service.registration;
 import edu.samir.schooldemo.controller.dto.UserDto;
 import edu.samir.schooldemo.exception.EmailNotValidException;
 import edu.samir.schooldemo.exception.TokenNotFoundException;
+import edu.samir.schooldemo.exception.UserNotFoundException;
 import edu.samir.schooldemo.persistence.entity.UserEntity;
 import edu.samir.schooldemo.security.JpaUserDetailsManager;
 import edu.samir.schooldemo.security.model.SecurityUser;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
+import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -30,7 +32,7 @@ public class RegistrationService {
     private final ConfirmationTokenService confirmationTokenService;
 
     @Transactional
-    public UserEntity registerNewUser(@NotNull final UserDto userDto) throws EmailNotValidException {
+    public UserEntity registerNewUser(@NotNull final String path, @NotNull final UserDto userDto) throws EmailNotValidException {
 
         boolean isValidEmail = this.emailValidator.test(userDto.getEmail());
         if (!isValidEmail) {
@@ -44,13 +46,13 @@ public class RegistrationService {
         userDetailsManager.createUser(new SecurityUser(userEntity));
         // Generate and save random Token
         confirmationTokenService.saveToken(confirmationToken);
-        // Send the Token
-        registrationEventPublisher.publishRegistrationEvent(confirmationToken.getToken(), userDto.getEmail());
+        // Email the Token
+        registrationEventPublisher.publishRegistrationEvent(userDto.getEmail(), confirmationToken.getToken(), path);
 
         return userEntity;
     }
 
-    public String reSendConfirmationToken(String username){
+    public String reSendConfirmationToken(@NotNull final String path, @NotNull final String username){
 
         UserEntity userEntity = ((SecurityUser) userDetailsManager.loadUserByUsername(username)).getUserEntity();
         ConfirmationToken confirmationToken = this.createRandomConfirmationToken(userEntity);
@@ -58,19 +60,19 @@ public class RegistrationService {
         // Generate and save random Token
         confirmationTokenService.saveToken(confirmationToken);
         // Send the Token
-        registrationEventPublisher.publishRegistrationEvent(confirmationToken.getToken(), userEntity.getEmail());
+        registrationEventPublisher.publishRegistrationEvent(confirmationToken.getToken(), userEntity.getEmail(), path);
 
         return "token sent";
     }
 
     @Transactional
-    public String confirmToken(String token) throws TokenNotFoundException {
+    public String confirmToken(String token) throws TokenNotFoundException, UserNotFoundException {
 
         ConfirmationToken confirmationToken = confirmationTokenService.getToken(token)
                                                                         .orElseThrow(() -> new TokenNotFoundException("the given token does NOT exists !"));
 
         if (confirmationToken.getConfirmedAt() != null){
-            throw new IllegalStateException("email already confirmed !");
+            throw new IllegalStateException("you are already confirmed !");
         }
 
         if (LocalDateTime.now().isAfter(confirmationToken.getExpiresAt())) {
@@ -78,7 +80,7 @@ public class RegistrationService {
         }
 
         confirmationTokenService.confirmToken(confirmationToken);
-        userDetailsManager.enableUser(confirmationToken.getUser().getUsername());
+        userDetailsManager.enableUser(confirmationToken.getUser());
 
         return "user confirmed & enabled";
     }

@@ -92,9 +92,8 @@ public class JpaUserDetailsManager implements UserDetailsManager {
         return securityUser.getUserEntity();
     }
 
-    public void enableUser(String username) {
-        SecurityUser securityUser = (SecurityUser) loadUserByUsername(username);
-        securityUser.getUserEntity().setEnabled(true);
-        this.updateUser(securityUser);
+    public void enableUser(UserEntity userEntity) throws UserNotFoundException {
+        userEntity.setEnabled(true);
+        userService.updateUser(userEntity.getId(), userEntity);
     }
 }
