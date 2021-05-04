@@ -7,12 +7,12 @@ import org.springframework.context.ApplicationEvent;
 public class RegistrationEvent extends ApplicationEvent {
 
     private final String email;
-    private final String registrationLink;
+    private final String emailBody;
 
-    public RegistrationEvent(Object source, String registrationLink, String email) {
+    public RegistrationEvent(Object source, String email, String emailBody) {
         super(source);
         this.email = email;
-        this.registrationLink = registrationLink;
+        this.emailBody = emailBody;
     }
 
 }

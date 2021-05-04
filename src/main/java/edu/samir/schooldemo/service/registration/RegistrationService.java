@@ -36,7 +36,7 @@ public class RegistrationService {
 
         boolean isValidEmail = this.emailValidator.test(userDto.getEmail());
         if (!isValidEmail) {
-            throw new EmailNotValidException(String.format("email %s is NOT valid",userDto.getEmail()));
+            throw new EmailNotValidException(String.format("email %s is NOT valid", userDto.getEmail()));
         }
 
         UserEntity userEntity = populateUserEntity(userDto);
@@ -47,7 +47,7 @@ public class RegistrationService {
         // Generate and save random Token
         confirmationTokenService.saveToken(confirmationToken);
         // Email the Token
-        registrationEventPublisher.publishRegistrationEvent(userDto.getEmail(), confirmationToken.getToken(), path);
+        registrationEventPublisher.publishRegistrationEvent(userEntity, confirmationToken.getToken(), path);
 
         return userEntity;
     }
@@ -60,7 +60,7 @@ public class RegistrationService {
         // Generate and save random Token
         confirmationTokenService.saveToken(confirmationToken);
         // Send the Token
-        registrationEventPublisher.publishRegistrationEvent(confirmationToken.getToken(), userEntity.getEmail(), path);
+        registrationEventPublisher.publishRegistrationEvent(userEntity, confirmationToken.getToken(), path);
 
         return "token sent";
     }
