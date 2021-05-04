@@ -28,20 +28,9 @@ public class RegistrationRestController {
         this.emailSenderService = emailSenderService;
     }
 
-    @GetMapping("/")
-    public String home() {
-        return "Home!";
-    }
-
-    //@Async
-    @GetMapping("/home")
+    @GetMapping("/secure")
     public String welcome() {
-        return "Welcome Home!!";
-    }
-
-    @GetMapping("/login")
-    public String securePage() {
-        return "Welcome to the login Page!";
+        return "This is secured endpoint !";
     }
 
     @PostMapping(
@@ -85,27 +74,4 @@ public class RegistrationRestController {
         }
         return "confirmed";
     }
-
-/*
-    @GetMapping(path = "/api/user/registration/confirmRegistration/{registrationPath}")
-    public ResponseEntity<UserEntity> validateRegistration(@PathVariable String registrationPath) throws EmailNotValidException {
-
-        boolean validaRegistration = emailSenderService.validateRegistration(registrationPath);
-
-        if ( !validaRegistration ){
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-        }
-
-        UserEntity newUserEntity = registrationService.registerNewUser(userDto);
-
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .replacePath("/api/student")
-                .path("/{id}")
-                .buildAndExpand(newUserEntity.getId())
-                .toUri();
-        return ResponseEntity.created(location).build();
-
-    }
-*/
 }

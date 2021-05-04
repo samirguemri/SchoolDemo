@@ -15,14 +15,13 @@ import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Component;
 
 @Component
-@Primary
-public class UsernamePasswordAuthenticationProvider implements AuthenticationProvider {
+public class UsernamePasswordAuthProvider implements AuthenticationProvider {
 
     private final UserDetailsManager userDetailsManager;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UsernamePasswordAuthenticationProvider(UserDetailsManager userDetailsManager, PasswordEncoder passwordEncoder) {
+    public UsernamePasswordAuthProvider(UserDetailsManager userDetailsManager, PasswordEncoder passwordEncoder) {
         this.userDetailsManager = userDetailsManager;
         this.passwordEncoder = passwordEncoder;
     }

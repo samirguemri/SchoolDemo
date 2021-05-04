@@ -1,5 +1,6 @@
 package edu.samir.schooldemo.security.provider;
 
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -12,13 +13,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Component;
 
+@AllArgsConstructor
 @Component
 public class MyAuthenticationProvider implements AuthenticationProvider {
 
-    @Autowired
-    private UserDetailsManager userDetailsManager;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UserDetailsManager userDetailsManager;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public Authentication authenticate(Authentication authentication)
@@ -35,6 +35,9 @@ public class MyAuthenticationProvider implements AuthenticationProvider {
         // if the request is authenticated we should return an fully authenticated (with authorities) authentication instance
         if (userDetails != null){
             if (passwordEncoder.matches(password, userDetails.getPassword())){
+                if (!userDetails.isEnabled()){
+                    throw new BadCredentialsException("User not yet enabled");
+                }
                 Authentication fullyAuthentication =
                         new UsernamePasswordAuthenticationToken(username, password, userDetails.getAuthorities());
                 return fullyAuthentication;
