@@ -2,7 +2,7 @@ package edu.samir.schooldemo.service;
 
 import edu.samir.schooldemo.service.registration.event.RegistrationEvent;
 import edu.samir.schooldemo.service.authentication.otp.Otp;
-import edu.samir.schooldemo.service.authentication.otp.OptRepository;
+import edu.samir.schooldemo.persistence.repository.OptRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;

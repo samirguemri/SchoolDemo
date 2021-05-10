@@ -6,48 +6,32 @@ import edu.samir.schooldemo.security.provider.UsernamePasswordAuthProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.security.web.util.matcher.AndRequestMatcher;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Configuration
 @EnableWebSecurity(debug = false)
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired private AuthenticationProvider myAuthenticationProvider;
     @Autowired private UsernamePasswordAuthProvider usernamePasswordAuthProvider;
     @Autowired private OtpAuthenticationProvider otpAuthenticationProvider;
     @Autowired private TokenAuthenticationProvider tokenAuthenticationProvider;
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception { // What and how to secure
+    private static final String[] CSRF_IGNORE = {"/login"};
 
-        http.formLogin()
-            .and().csrf().disable();
-
-        http
-            .authorizeRequests()
-                .antMatchers("/index*").permitAll()
-                .antMatchers("/css/**", "/js/**").permitAll()
-                .antMatchers("/api/user/registration/**").permitAll()
-            .anyRequest().authenticated();//permitAll();//
-
-//        http.addFilterAt(multifactorAuthenticationFilter(), BasicAuthenticationFilter.class)
-//                .addFilterAfter(tokenAuthenticationFilter(), BasicAuthenticationFilter.class);
-    }
-
+    // Authentication Configuration
     @Override
     protected void configure(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(this.myAuthenticationProvider)
@@ -55,6 +39,44 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationProvider(this.otpAuthenticationProvider)
                 .authenticationProvider(this.tokenAuthenticationProvider);
         return;
+    }
+
+    // Authorization Configuration
+    @Override
+    protected void configure(HttpSecurity http) throws Exception { // What and how to secure
+
+        http.csrf().disable();
+        http.httpBasic();
+/*
+        http.formLogin()
+                .loginPage("/login").permitAll()
+                    .defaultSuccessUrl("/userhomepage", true)
+                .and()
+                .rememberMe()
+                .tokenValiditySeconds(((int) TimeUnit.DAYS.toSeconds(10)))
+                .and()
+                .logout()
+                    .logoutUrl("/logout")
+                    .logoutRequestMatcher(new AntPathRequestMatcher("logout", HttpMethod.GET.name()))
+                    .invalidateHttpSession(true)
+                    .clearAuthentication(true)
+                    .deleteCookies("JSESSIONID", "remember-me")
+                    .logoutSuccessUrl("/login");
+*/
+
+        http.authorizeRequests()
+                .mvcMatchers("/api/manager/**").hasAnyRole("MANAGER")
+                .mvcMatchers("/api/admin/**").hasAnyRole("ADMIN","MANAGER")
+                .mvcMatchers("/api/teacher/**").hasAnyRole("TEACHER","ADMIN")
+                .mvcMatchers("/api/student/**").hasAnyRole("STUDENT","ADMIN")
+                .mvcMatchers("/users/**").hasAnyRole("MANAGER","ADMIN")
+                .mvcMatchers("/","/home","/index*","/static/css/**","/static/js/**").permitAll()
+                .mvcMatchers("/api/user/registration/**").anonymous()
+                .anyRequest().authenticated();
+
+//        http.addFilterAfter(csrfLoggerFilter(), CsrfFilter.class);
+//        http.addFilterAt(multifactorAuthenticationFilter(), BasicAuthenticationFilter.class)
+//                .addFilterAfter(tokenAuthenticationFilter(), BasicAuthenticationFilter.class);
     }
 
     @Override
@@ -70,6 +92,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
 /*
+    @Bean
+    public CsrfLoggerFilter csrfLoggerFilter(){
+        return new CsrfLoggerFilter();
+    };
+
     @Bean
     public MultifactorAuthenticationFilter multifactorAuthenticationFilter(){
         return new MultifactorAuthenticationFilter();

@@ -1,4 +1,4 @@
-package edu.samir.schooldemo.controller;
+package edu.samir.schooldemo.controller.student;
 
 import edu.samir.schooldemo.exception.UserNotFoundException;
 import edu.samir.schooldemo.persistence.entity.UserEntity;

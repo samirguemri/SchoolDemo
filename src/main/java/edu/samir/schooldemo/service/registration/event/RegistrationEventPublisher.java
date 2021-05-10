@@ -14,7 +14,7 @@ public class RegistrationEventPublisher {
     private final ApplicationEventPublisher applicationEventPublisher;
 
     public void publishRegistrationEvent(UserEntity user, String token, @NotNull String path) {
-        String registrationLink = path + "/confirm?token=" + token;
+        String registrationLink = path + "/api/user/registration/confirm?token=" + token;
         String emailBody = this.buildEmailBody(user.getFirstName(), registrationLink);
         RegistrationEvent registrationEvent = new RegistrationEvent(this, user.getEmail(), emailBody);
         this.applicationEventPublisher.publishEvent(registrationEvent);

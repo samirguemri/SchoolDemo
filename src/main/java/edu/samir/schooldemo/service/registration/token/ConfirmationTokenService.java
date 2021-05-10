@@ -1,5 +1,6 @@
 package edu.samir.schooldemo.service.registration.token;
 
+import edu.samir.schooldemo.persistence.repository.ConfirmationTokenRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,7 @@ public class ConfirmationTokenService {
     }
 
     public Optional<ConfirmationToken> getToken(String token) {
-        return confirmationTokenRepository.findConfirmationTokenByToken(token);
+        return confirmationTokenRepository.findByToken(token);
     }
 
     public void confirmToken(ConfirmationToken token){

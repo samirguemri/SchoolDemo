@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Add New Student</title>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
+</head>
+<body>
+    <div class="container">
+        <div class="card bg-dark ">
+            <article class="card-body mx-auto" style="max-width: 400px;">
+                <h4 class="card-title mt-3 text-center text-light">Create Account</h4>
+                <p class="divider-text">
+                    <span class="bg-light"/>
+                </p>
+                <p>
+                    <a href="" class="btn btn-primary btn-block btn-twitter">
+                        <i class="fab fa-twitter"></i>   Login via Twitter
+                    </a>
+                    <a href="" class="btn btn-primary btn-block btn-facebook">
+                        <i class="fab fa-facebook-f"></i>   Login via facebook
+                    </a>
+                </p>
+                <p class="divider-text text-center ">
+                    <span class="text-light bg-dark">OR</span>
+                </p>
+                <form class="needs-validation" th:action="@{/student/add}" th:object="${student}" method="post"  novalidate>
+                    <div class="form-group input-group">
+                        <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <i class="fa fa-user"></i>
+                                </span>
+                        </div>
+                        <input class="form-control" type="text" th:field="*{firstName}" placeholder="First name" required>
+                    </div> <!-- form-group// -->
+                    <div class="form-group input-group">
+                        <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <i class="fa fa-user"></i>
+                                </span>
+                        </div>
+                        <input class="form-control" type="text" th:field="*{lastName}" placeholder="Last name" required>
+                    </div> <!-- form-group// -->
+                    <div class="form-group input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">
+                                <i class="fa fa-envelope"></i>
+                            </span>
+                        </div>
+                        <input class="form-control" type="email" th:field="*{email}" placeholder="Email address" required>
+                    </div> <!-- form-group// -->
+                    <div class="form-group input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">
+                                <i class="fa fa-calendar-alt"></i>
+                            </span>
+                        </div>
+                        <input class="form-control" type="date" th:field="*{birthday}" placeholder="Birthday" required>
+                    </div> <!-- form-group// -->
+                    <div class="form-group input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">
+                                <i class="fa fa-at"></i>
+                            </span>
+                        </div>
+                        <input class="form-control" type="text" th:field="*{username}" placeholder="Username" required>
+                    </div> <!-- form-group// -->
+                    <div class="form-group input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">
+                                <i class="fa fa-lock"></i>
+                            </span>
+                        </div>
+                        <input class="form-control" id="inputPassword" type="password" th:field="*{password}" placeholder="Create password" required>
+                    </div>  <!-- form-group// -->
+                    <div class="form-group input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">
+                                <i class="fa fa-lock"></i>
+                            </span>
+                        </div>
+                        <input class="form-control" id="inputPasswordConfirm" type="password" placeholder="Repeat password" data-match="#inputPassword"  required>
+                    </div> <!-- form-group// -->
+                    <div class="form-group input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">
+                                <i class="fa fa-id-badge"></i>
+                            </span>
+                        </div>
+                        <select name="user" class="form-control">
+                            <option selected=""> Select User type</option>
+                            <option>Student</option>
+                            <option>Teacher</option>
+                            <option>Admin</option>
+                            <option>Manager</option>
+                        </select>
+                    </div> <!-- form-group end.// -->
+                    <div class="form-group">
+                        <button class="btn btn-primary btn-block" type="submit" > Create Account</button>
+                    </div> <!-- form-group// -->
+                    <p class="text-center text-light" >Have an account? <a href="">Log In</a></p>
+                </form>
+            </article>
+        </div> <!-- card.// -->
+    </div> <!--container end.//-->
+</body>
+</html>

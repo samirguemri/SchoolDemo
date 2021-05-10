@@ -6,9 +6,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -31,11 +31,19 @@ public class CustomUserDetails implements UserDetails {
     }
 
     @Override
+    @Transactional
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Collection<UserRole> userRoles = this.getUserEntity().getUserRoles();
-        return userRoles.stream()
-                .map(userRole -> new SimpleGrantedAuthority(userRole.getRole().getRoleName()) )
-                .collect(Collectors.toList());
+        Collection<GrantedAuthority> authorities = new HashSet<>();
+        Collection<UserRole> userRoles = userEntity.getUserRoles();
+        for (UserRole userRole : userRoles) {
+            authorities.add(new SimpleGrantedAuthority(userRole.getRole().name()));
+            authorities.addAll(userRole.getPermissions()
+                    .stream()
+                    .map(userPermission -> new SimpleGrantedAuthority(userPermission.getPermission().name()))
+                    .collect(Collectors.toSet())
+            );
+        }
+        return authorities;
     }
 
     @Override

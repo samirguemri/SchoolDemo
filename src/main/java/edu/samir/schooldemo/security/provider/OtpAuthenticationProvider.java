@@ -1,6 +1,6 @@
 package edu.samir.schooldemo.security.provider;
 
-import edu.samir.schooldemo.service.authentication.otp.OptRepository;
+import edu.samir.schooldemo.persistence.repository.OptRepository;
 import edu.samir.schooldemo.security.authentication.OtpAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;

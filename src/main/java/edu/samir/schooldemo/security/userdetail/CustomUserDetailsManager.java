@@ -24,7 +24,7 @@ public class CustomUserDetailsManager implements UserDetailsManager {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        final Optional<UserEntity> optionalStudent = userRepository.findUserByUsername(username);
+        final Optional<UserEntity> optionalStudent = userRepository.findByUsername(username);
         UserEntity userEntity = optionalStudent.orElseThrow(() -> new UsernameNotFoundException("User with the given username does NOT EXISTS"));
         return new CustomUserDetails(userEntity);
     }
@@ -71,17 +71,19 @@ public class CustomUserDetailsManager implements UserDetailsManager {
             throw new AccessDeniedException("Can't change password as no Authentication object found in context for current user.");
         }
         String username = currentUser.getName();
-        UserEntity userEntity = getUserFromUserDetails(loadUserByUsername(username));
+        UserDetails userDetails = loadUserByUsername(username);
+        UserEntity userEntity = getUserFromUserDetails(userDetails);
         userEntity.setPassword(newPassword);
+        userRepository.save(userEntity);
     }
 
     @Override
     public boolean userExists(String username) {
-            return userRepository.findUserByUsername(username).isPresent();
+            return userRepository.findByUsername(username).isPresent();
     }
 
     public boolean emailExists(String email) {
-        return userRepository.findUserByEmail(email).isPresent();
+        return userRepository.findByEmail(email).isPresent();
     }
 
     private UserEntity getUserFromUserDetails(UserDetails userDetails){

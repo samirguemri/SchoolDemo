@@ -5,10 +5,11 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.Collection;
+import java.util.*;
 
 @FieldDefaults(level= AccessLevel.PRIVATE)
 @NoArgsConstructor
@@ -53,7 +54,11 @@ public class UserEntity {
     @Column(columnDefinition = "BOOLEAN")
     boolean enabled;
 
-    @ManyToMany(cascade=CascadeType.ALL)
+    @ManyToMany(
+            targetEntity = UserRole.class,
+            cascade=CascadeType.ALL,
+            fetch = FetchType.EAGER
+    )
     @JoinTable(
             name = "user_role_association",
             joinColumns = @JoinColumn(name = "userId", referencedColumnName = "id"),
@@ -62,7 +67,7 @@ public class UserEntity {
             inverseForeignKey = @ForeignKey(name = "ROLE_FOREIGN_KEY_CONSTRAINTS")
     )
     @Column
-    Collection<UserRole> userRoles;
+    List<UserRole> userRoles;
 
     public UserEntity(UserDto userDto) {
         this.firstName = userDto.getFirstName();

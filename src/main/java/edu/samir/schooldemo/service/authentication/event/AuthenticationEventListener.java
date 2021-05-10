@@ -9,6 +9,6 @@ public class AuthenticationEventListener implements ApplicationListener<Authenti
     @Override
     public void onApplicationEvent(AuthenticationEvent authenticationEvent) {
 
-        // TODO: authenticationEvent Logic
+        // TODO: implement authenticationEvent Logic
     }
 }

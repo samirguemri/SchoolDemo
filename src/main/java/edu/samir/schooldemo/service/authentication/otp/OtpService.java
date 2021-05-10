@@ -1,5 +1,6 @@
 package edu.samir.schooldemo.service.authentication.otp;
 
+import edu.samir.schooldemo.persistence.repository.OptRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

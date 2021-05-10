@@ -1,4 +1,4 @@
-package edu.samir.schooldemo.service.authentication.otp;
+package edu.samir.schooldemo.persistence.repository;
 
 import edu.samir.schooldemo.service.authentication.otp.Otp;
 import org.springframework.data.jpa.repository.JpaRepository;

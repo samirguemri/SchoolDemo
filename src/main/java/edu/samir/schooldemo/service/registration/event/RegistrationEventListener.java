@@ -1,6 +1,7 @@
 package edu.samir.schooldemo.service.registration.event;
 
-import edu.samir.schooldemo.service.email.EmailService;
+import edu.samir.schooldemo.service.email.EmailSender;
+import edu.samir.schooldemo.service.email.EmailSenderImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
@@ -9,10 +10,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class RegistrationEventListener implements ApplicationListener<RegistrationEvent> {
 
-    private final EmailService emailService;
+    private final EmailSender emailSender;
 
     @Override
     public void onApplicationEvent(RegistrationEvent registrationEvent) {
-        emailService.send(registrationEvent.getEmail(), registrationEvent.getEmailBody());
+        emailSender.send(registrationEvent.getEmail(), registrationEvent.getEmailBody());
     }
 }

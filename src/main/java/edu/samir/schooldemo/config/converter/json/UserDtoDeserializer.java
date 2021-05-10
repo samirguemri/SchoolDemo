@@ -1,4 +1,4 @@
-package edu.samir.schooldemo.config.json;
+package edu.samir.schooldemo.config.converter.json;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -38,4 +38,5 @@ public class UserDtoDeserializer extends StdDeserializer<UserEntity> {
 
         return new UserEntity(firstName,lastName,email,birthday, age,username,password);
     }
+
 }

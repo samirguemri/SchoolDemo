@@ -4,16 +4,16 @@ import edu.samir.schooldemo.persistence.entity.UserEntity;
 import edu.samir.schooldemo.persistence.entity.UserPermission;
 import edu.samir.schooldemo.persistence.entity.UserRole;
 import edu.samir.schooldemo.persistence.repository.UserRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import lombok.AllArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import static edu.samir.schooldemo.persistence.entity.enums.Permission.*;
 import static edu.samir.schooldemo.persistence.entity.enums.Role.*;
@@ -26,9 +26,9 @@ public class SetupUsersDataConfig {
     private final UserRepository userRepository;
 
     @Bean
-    CommandLineRunner commandLineRunner(){
+    public CommandLineRunner commandLineRunner(){
         return args -> {
-            this.setupUsersData();
+//            this.setupUsersData();
         };
     }
 
@@ -42,16 +42,16 @@ public class SetupUsersDataConfig {
         UserPermission adminRead = new UserPermission(ADMIN_READ);
         UserPermission adminWrite = new UserPermission(ADMIN_WRITE);
 
-        UserRole studentRole = new UserRole(STUDENT);
+        UserRole studentRole = new UserRole(ROLE_STUDENT);
         studentRole.setPermissions(List.of(studentRead, studentWrite));
 
-        UserRole teacherRole = new UserRole(TEACHER);
+        UserRole teacherRole = new UserRole(ROLE_TEACHER);
         teacherRole.setPermissions(List.of(courseRead, courseWrite, studentRead));
 
-        UserRole adminRole = new UserRole(ADMIN);
+        UserRole adminRole = new UserRole(ROLE_ADMIN);
         adminRole.setPermissions(List.of(adminRead, courseRead, studentRead, studentWrite));
 
-        UserRole managerRole = new UserRole(MANAGER);
+        UserRole managerRole = new UserRole(ROLE_MANAGER);
         managerRole.setPermissions(List.of(adminRead, adminWrite, courseRead, studentRead, studentWrite));
 
         UserEntity jean = new UserEntity(

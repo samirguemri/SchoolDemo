@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
-import java.util.Collection;
+import java.util.*;
 
 @FieldDefaults(level= AccessLevel.PRIVATE)
 @NoArgsConstructor
@@ -33,7 +33,7 @@ public class UserRole {
             inverseForeignKey = @ForeignKey(name = "PERMISSION_FOREIGN_KEY_CONSTRAINTS")
     )
     @Column
-    Collection<UserPermission> permissions;
+    List<UserPermission> permissions;
 
     public UserRole(Role role) {
         this.role = role;
